@@ -1,11 +1,20 @@
 package com.example.jobpilot.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "cv")
+@Table(name = "resumes")
 public class Cv {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,13 +26,14 @@ public class Cv {
 
     private String phone;
 
-    @Column(length =2000 )
+    @Column(length = 2000)
     private String summary;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "cv", cascade = CascadeType.ALL)
     private List<Experience> experiences;
 

@@ -1,7 +1,16 @@
 package com.example.jobpilot.entity;
 
+import com.example.jobpilot.enums.SkillLevel;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "skills")
 public class Skill {
@@ -11,7 +20,8 @@ public class Skill {
 
     private String name;
 
-    private String level;
+    @Enumerated(EnumType.STRING)
+    private SkillLevel level;
 
     @ManyToOne
     @JoinColumn(name = "cv_id")

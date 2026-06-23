@@ -2,9 +2,17 @@ package com.example.jobpilot.entity;
 
 import com.example.jobpilot.enums.ApplicationStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "appliccations")
 public class Application {
@@ -23,5 +31,10 @@ public class Application {
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
-    private LocalDateTime appliedAt=LocalDateTime.now();
+    private LocalDateTime appliedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.appliedAt = LocalDateTime.now();
+    }
 }

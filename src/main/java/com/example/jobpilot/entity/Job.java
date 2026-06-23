@@ -1,10 +1,18 @@
 package com.example.jobpilot.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "jobs")
 public class Job {
@@ -21,14 +29,20 @@ public class Job {
 
     private String location;
 
-    private String Salary;
+    private String salary;
 
-    private String requiredSkills;
+    @ElementCollection
+    private List<String> requiredSkills;
 
     private String url;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "job",cascade = CascadeType.ALL)
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Application> applications;
 }

@@ -1,9 +1,17 @@
 package com.example.jobpilot.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "educations")
 public class Education {
@@ -19,7 +27,7 @@ public class Education {
 
     private LocalDate startDate;
 
-    private  LocalDate endDate;
+    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "cv_id")
