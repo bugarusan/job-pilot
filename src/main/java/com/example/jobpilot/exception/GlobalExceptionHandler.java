@@ -62,4 +62,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(CvAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleCvAlreadyExists(CvAlreadyExistsException ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
 }
