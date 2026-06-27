@@ -3,6 +3,7 @@ package com.example.jobpilot.service.impl;
 import com.example.jobpilot.entity.Cv;
 import com.example.jobpilot.entity.User;
 import com.example.jobpilot.exception.CvAlreadyExistsException;
+import com.example.jobpilot.exception.CvNotFoundException;
 import com.example.jobpilot.exception.UserNotFoundException;
 import com.example.jobpilot.repository.CvRepository;
 import com.example.jobpilot.repository.UserRepository;
@@ -35,21 +36,36 @@ public class CvServiceImpl implements CvService {
 
     @Override
     public Cv getById(Long id) {
-        return null;
+        return cvRepository.findById(id)
+                .orElseThrow(() -> new CvNotFoundException(id));
     }
 
     @Override
     public Cv getByUserId(Long userId) {
-        return null;
+        return cvRepository.findByUserId(userId)
+                .orElseThrow(() -> new CvNotFoundException(userId));
     }
 
     @Override
     public Cv update(Long id, Cv cv) {
-        return null;
+
+        Cv existingCv = cvRepository.findById(id)
+                .orElseThrow(() -> new CvNotFoundException(id));
+
+        existingCv.setFullName(cv.getFullName());
+        existingCv.setEmail(cv.getEmail());
+        existingCv.setPhone(cv.getPhone());
+        existingCv.setSummary(cv.getSummary());
+
+        return cvRepository.save(existingCv);
     }
 
     @Override
     public void delete(Long id) {
 
+        Cv cv = cvRepository.findById(id)
+                .orElseThrow(() -> new CvNotFoundException(id));
+
+        cvRepository.delete(cv);
     }
 }
