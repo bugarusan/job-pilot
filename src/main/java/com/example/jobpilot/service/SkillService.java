@@ -1,17 +1,20 @@
 package com.example.jobpilot.service;
 
-import com.example.jobpilot.entity.Skill;
+import com.example.jobpilot.dto.request.CreateSkillRequest;
+import com.example.jobpilot.dto.request.UpdateSkillRequest;
+import com.example.jobpilot.dto.response.SkillResponse;
 
 import java.util.List;
 
 public interface SkillService {
-    Skill create(Long cvId, Skill skill);
 
-    Skill getById(Long id);
+    SkillResponse create(Long cvId, CreateSkillRequest request);
 
-    List<Skill> getByCvId(Long cvId);
+    SkillResponse getById(Long id);
 
-    Skill update(Long id, Skill skill);
+    List<SkillResponse> getByCvId(Long cvId);
+
+    SkillResponse update(Long id, UpdateSkillRequest request);
 
     void delete(Long id);
 }

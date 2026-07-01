@@ -1,18 +1,21 @@
 package com.example.jobpilot.service;
 
+import com.example.jobpilot.dto.request.CreateExperienceRequest;
+import com.example.jobpilot.dto.request.UpdateExperienceRequest;
+import com.example.jobpilot.dto.response.ExperienceResponse;
 import com.example.jobpilot.entity.Experience;
 
 import java.util.List;
 
 public interface ExperienceService {
 
-    Experience create(Long cvId, Experience experience);
+    ExperienceResponse create(Long cvId, CreateExperienceRequest request);
 
-    Experience getById(Long id);
+    ExperienceResponse getById(Long id);
 
-    List<Experience> getByCvId(Long cvId);
+    List<ExperienceResponse> getByCvId(Long cvId);
 
-    Experience update(Long id, Experience experience);
+    ExperienceResponse update(Long id, UpdateExperienceRequest request);
 
     void delete(Long id);
 }

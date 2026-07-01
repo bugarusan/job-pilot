@@ -1,15 +1,18 @@
 package com.example.jobpilot.service;
 
-import com.example.jobpilot.entity.Cv;
+import com.example.jobpilot.dto.request.CreateCvRequest;
+import com.example.jobpilot.dto.request.UpdateCvRequest;
+import com.example.jobpilot.dto.response.CvResponse;
 
 public interface CvService {
-    Cv create(Long userId, Cv cv);
 
-    Cv getById(Long id);
+    CvResponse create(Long userId, CreateCvRequest request);
 
-    Cv getByUserId(Long userId);
+    CvResponse getById(Long id);
 
-    Cv update(Long id, Cv cv);
+    CvResponse getByUserId(Long userId);
+
+    CvResponse update(Long id, UpdateCvRequest request);
 
     void delete(Long id);
 }

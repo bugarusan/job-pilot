@@ -1,74 +1,108 @@
 package com.example.jobpilot.service.impl;
 
+import com.example.jobpilot.dto.request.CreateExperienceRequest;
+import com.example.jobpilot.dto.request.UpdateExperienceRequest;
+import com.example.jobpilot.dto.response.ExperienceResponse;
 import com.example.jobpilot.entity.Cv;
 import com.example.jobpilot.entity.Experience;
 import com.example.jobpilot.exception.CvNotFoundException;
 import com.example.jobpilot.exception.ExperienceNotFoundException;
+import com.example.jobpilot.mapper.ExperienceMapper;
 import com.example.jobpilot.repository.CvRepository;
 import com.example.jobpilot.repository.ExperienceRepository;
 import com.example.jobpilot.service.ExperienceService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExperienceServiceImpl implements ExperienceService {
 
     private final ExperienceRepository experienceRepository;
     private final CvRepository cvRepository;
+    private final ExperienceMapper experienceMapper;
 
-    public ExperienceServiceImpl(ExperienceRepository experienceRepository, CvRepository cvRepository) {
+    public ExperienceServiceImpl(ExperienceRepository experienceRepository,
+                                 CvRepository cvRepository,
+                                 ExperienceMapper experienceMapper) {
         this.experienceRepository = experienceRepository;
         this.cvRepository = cvRepository;
+        this.experienceMapper = experienceMapper;
     }
 
-
     @Override
-    public Experience create(Long cvId, Experience experience) {
+    public ExperienceResponse create(Long cvId, CreateExperienceRequest request) {
+
         Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
 
+        Experience experience = new Experience();
+        experience.setCompany(request.getCompany());
+        experience.setPosition(request.getPosition());
+        experience.setStartDate(request.getStartDate());
+        experience.setEndDate(request.getEndDate());
+        experience.setDescription(request.getDescription());
         experience.setCv(cv);
 
-        return experienceRepository.save(experience);
+        Experience saved = experienceRepository.save(experience);
+
+        return experienceMapper.toResponse(saved);
     }
 
     @Override
-    public Experience getById(Long id) {
-        return experienceRepository.findById(id)
+    public ExperienceResponse getById(Long id) {
+
+        Experience experience = experienceRepository.findById(id)
                 .orElseThrow(() -> new ExperienceNotFoundException(id));
+
+        return experienceMapper.toResponse(experience);
     }
 
     @Override
-    public List<Experience> getByCvId(Long cvId) {
+    public List<ExperienceResponse> getByCvId(Long cvId) {
 
         cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
 
-        return experienceRepository.findByCvId(cvId);
+        return experienceRepository.findByCvId(cvId)
+                .stream()
+                .map(experienceMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Experience update(Long id, Experience experience) {
-        Experience existingExperience = experienceRepository.findById(id)
+    public ExperienceResponse update(Long id, UpdateExperienceRequest request) {
+
+        Experience experience = experienceRepository.findById(id)
                 .orElseThrow(() -> new ExperienceNotFoundException(id));
-        existingExperience.setCompany(experience.getCompany());
-        existingExperience.setDescription(experience.getDescription());
-        existingExperience.setPosition(experience.getPosition());
-        existingExperience.setEndDate(experience.getEndDate());
-        existingExperience.setStartDate(experience.getStartDate());
 
+        if (request.getCompany() != null)
+            experience.setCompany(request.getCompany());
 
-        return experienceRepository.save(existingExperience);
+        if (request.getPosition() != null)
+            experience.setPosition(request.getPosition());
+
+        if (request.getStartDate() != null)
+            experience.setStartDate(request.getStartDate());
+
+        if (request.getEndDate() != null)
+            experience.setEndDate(request.getEndDate());
+
+        if (request.getDescription() != null)
+            experience.setDescription(request.getDescription());
+
+        Experience updated = experienceRepository.save(experience);
+
+        return experienceMapper.toResponse(updated);
     }
 
     @Override
     public void delete(Long id) {
+
         Experience experience = experienceRepository.findById(id)
                 .orElseThrow(() -> new ExperienceNotFoundException(id));
 
         experienceRepository.delete(experience);
-
-
     }
 }
