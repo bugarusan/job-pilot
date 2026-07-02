@@ -1,15 +1,18 @@
 package com.example.jobpilot.service;
 
+import com.example.jobpilot.dto.request.RegisterRequest;
+import com.example.jobpilot.dto.request.UpdateUserRequest;
+import com.example.jobpilot.dto.response.UserResponse;
 import com.example.jobpilot.entity.User;
 
 public interface UserService {
-    User register(User user);
+    UserResponse register(RegisterRequest request);
 
-    User getById(Long id);
+    UserResponse getById(Long id);
 
-    User getByEmail(String email);
+    UserResponse getByEmail(String email);
 
-    User updateProfile(Long id, User user);
+    UserResponse updateProfile(Long id, UpdateUserRequest request);
 
     void deleteAccount(Long id);
 }

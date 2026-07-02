@@ -1,13 +1,12 @@
 package com.example.jobpilot.service;
 
-import com.example.jobpilot.entity.Job;
+import com.example.jobpilot.dto.response.JobResponse;
 
 import java.util.List;
 
 public interface JobService {
 
-    Job getById(Long id);
+    JobResponse getById(Long id);
 
-    List<Job> getAll();
-
+    List<JobResponse> getAll();
 }

@@ -1,19 +1,19 @@
 package com.example.jobpilot.service;
 
-import com.example.jobpilot.entity.Application;
+import com.example.jobpilot.dto.response.ApplicationResponse;
 import com.example.jobpilot.enums.ApplicationStatus;
 
 import java.util.List;
 
 public interface ApplicationService {
 
-    Application create(Long userId, Long jobId);
+    ApplicationResponse create(Long userId, Long jobId);
 
-    Application getById(Long id);
+    ApplicationResponse getById(Long id);
 
-    List<Application> getByUserId(Long userId);
+    List<ApplicationResponse> getByUserId(Long userId);
 
-    Application updateStatus(Long id, ApplicationStatus status);
+    ApplicationResponse updateStatus(Long id, ApplicationStatus status);
 
     void delete(Long id);
 }
