@@ -17,7 +17,7 @@ public class CvController {
 
     private final CvService cvService;
 
-    @PostMapping("/api/v1/users/{userId}/cv")
+    @PostMapping("/{userId}/cv")
     public ResponseEntity<CvResponse> create(
             @PathVariable Long userId,
             @Valid @RequestBody CreateCvRequest request) {
@@ -27,7 +27,7 @@ public class CvController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/api/v1/cvs/{id}")
+    @GetMapping("/cvs/{id}")
     public ResponseEntity<CvResponse> getById(@PathVariable Long id) {
 
         CvResponse response = cvService.getById(id);
@@ -35,7 +35,7 @@ public class CvController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/v1/users/{userId}/cv")
+    @GetMapping("/{userId}/cv")
     public ResponseEntity<CvResponse> getByUserId(@PathVariable Long userId) {
 
         CvResponse response = cvService.getByUserId(userId);
@@ -43,7 +43,7 @@ public class CvController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/api/v1/cvs/{id}")
+    @PutMapping("/cvs/{id}")
     public ResponseEntity<CvResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateCvRequest request) {
@@ -53,7 +53,7 @@ public class CvController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/api/v1/cvs/{id}")
+    @DeleteMapping("/cvs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 
         cvService.delete(id);
