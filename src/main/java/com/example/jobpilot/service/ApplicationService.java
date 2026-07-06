@@ -1,7 +1,7 @@
 package com.example.jobpilot.service;
 
+import com.example.jobpilot.dto.request.UpdateApplicationStatusRequest;
 import com.example.jobpilot.dto.response.ApplicationResponse;
-import com.example.jobpilot.enums.ApplicationStatus;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public interface ApplicationService {
 
     List<ApplicationResponse> getByUserId(Long userId);
 
-    ApplicationResponse updateStatus(Long id, ApplicationStatus status);
+    ApplicationResponse updateStatus(Long id, UpdateApplicationStatusRequest request);
 
     void delete(Long id);
 }

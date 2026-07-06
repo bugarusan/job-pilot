@@ -1,5 +1,6 @@
 package com.example.jobpilot.service.impl;
 
+import com.example.jobpilot.dto.request.UpdateApplicationStatusRequest;
 import com.example.jobpilot.dto.response.ApplicationResponse;
 import com.example.jobpilot.entity.Application;
 import com.example.jobpilot.entity.Job;
@@ -83,12 +84,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationResponse updateStatus(Long id, ApplicationStatus status) {
+    public ApplicationResponse updateStatus(Long id, UpdateApplicationStatusRequest request) {
 
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
 
-        application.setStatus(status);
+        application.setStatus(request.getStatus());
 
         Application updated = applicationRepository.save(application);
 
