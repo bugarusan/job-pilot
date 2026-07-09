@@ -4,6 +4,7 @@ import com.example.jobpilot.dto.request.RegisterRequest;
 import com.example.jobpilot.dto.request.UpdateUserRequest;
 import com.example.jobpilot.dto.response.UserResponse;
 import com.example.jobpilot.entity.User;
+import com.example.jobpilot.exception.EmailAlreadyExistsException;
 import com.example.jobpilot.exception.UserNotFoundException;
 import com.example.jobpilot.mapper.UserMapper;
 import com.example.jobpilot.repository.UserRepository;
@@ -24,6 +25,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse register(RegisterRequest request) {
+
+        userRepository.findByEmail(request.getEmail())
+                .ifPresent(user -> {
+                    throw new EmailAlreadyExistsException(request.getEmail());
+                });
 
         User user = new User();
         user.setFullName(request.getFullName());
