@@ -5,6 +5,7 @@ import com.example.jobpilot.dto.request.UpdateCvRequest;
 import com.example.jobpilot.dto.response.CvResponse;
 import com.example.jobpilot.entity.Cv;
 import com.example.jobpilot.entity.User;
+import com.example.jobpilot.exception.CvAlreadyExistsException;
 import com.example.jobpilot.exception.CvNotFoundException;
 import com.example.jobpilot.exception.UserNotFoundException;
 import com.example.jobpilot.mapper.CvMapper;
@@ -33,6 +34,11 @@ public class CvServiceImpl implements CvService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+
+        cvRepository.findByUserId(userId)
+                .ifPresent(existingCv -> {
+                    throw new CvAlreadyExistsException(userId);
+                });
 
         Cv cv = new Cv();
         cv.setFullName(request.getFullName());
