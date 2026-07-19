@@ -8,7 +8,9 @@ import com.example.jobpilot.exception.EmailAlreadyExistsException;
 import com.example.jobpilot.exception.UserNotFoundException;
 import com.example.jobpilot.mapper.UserMapper;
 import com.example.jobpilot.repository.UserRepository;
+import com.example.jobpilot.security.CurrentUserProvider;
 import com.example.jobpilot.service.UserService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +20,24 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public UserServiceImpl(UserRepository userRepository,
                            UserMapper userMapper,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           CurrentUserProvider currentUserProvider) {
 
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    private void checkOwnership(Long targetUserId) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (!currentUserId.equals(targetUserId)) {
+            throw new AccessDeniedException("Bu hesab sənə aid deyil");
+        }
     }
 
     @Override
@@ -49,6 +61,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getById(Long id) {
 
+        checkOwnership(id);
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -66,6 +80,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateProfile(Long id, UpdateUserRequest request) {
+
+        checkOwnership(id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -85,6 +101,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteAccount(Long id) {
+
+        checkOwnership(id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

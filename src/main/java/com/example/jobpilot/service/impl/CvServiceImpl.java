@@ -11,7 +11,9 @@ import com.example.jobpilot.exception.UserNotFoundException;
 import com.example.jobpilot.mapper.CvMapper;
 import com.example.jobpilot.repository.CvRepository;
 import com.example.jobpilot.repository.UserRepository;
+import com.example.jobpilot.security.CurrentUserProvider;
 import com.example.jobpilot.service.CvService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,17 +22,29 @@ public class CvServiceImpl implements CvService {
     private final CvRepository cvRepository;
     private final UserRepository userRepository;
     private final CvMapper cvMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public CvServiceImpl(CvRepository cvRepository,
                          UserRepository userRepository,
-                         CvMapper cvMapper) {
+                         CvMapper cvMapper,
+                         CurrentUserProvider currentUserProvider) {
         this.cvRepository = cvRepository;
         this.userRepository = userRepository;
         this.cvMapper = cvMapper;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    private void checkOwnership(Long targetUserId) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (!currentUserId.equals(targetUserId)) {
+            throw new AccessDeniedException("Bu CV sənə aid deyil");
+        }
     }
 
     @Override
     public CvResponse create(Long userId, CreateCvRequest request) {
+
+        checkOwnership(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -57,11 +71,16 @@ public class CvServiceImpl implements CvService {
         Cv cv = cvRepository.findById(id)
                 .orElseThrow(() -> new CvNotFoundException(id));
 
+        checkOwnership(cv.getUser().getId());
+
         return cvMapper.toResponse(cv);
     }
 
     @Override
     public CvResponse getByUserId(Long userId) {
+
+        checkOwnership(userId);
+
         Cv cv = cvRepository.findByUserId(userId)
                 .orElseThrow(() -> new CvNotFoundException(userId));
 
@@ -73,6 +92,8 @@ public class CvServiceImpl implements CvService {
 
         Cv cv = cvRepository.findById(id)
                 .orElseThrow(() -> new CvNotFoundException(id));
+
+        checkOwnership(cv.getUser().getId());
 
         if (request.getFullName() != null)
             cv.setFullName(request.getFullName());
@@ -93,6 +114,12 @@ public class CvServiceImpl implements CvService {
 
     @Override
     public void delete(Long id) {
-        cvRepository.deleteById(id);
+
+        Cv cv = cvRepository.findById(id)
+                .orElseThrow(() -> new CvNotFoundException(id));
+
+        checkOwnership(cv.getUser().getId());
+
+        cvRepository.delete(cv);
     }
 }

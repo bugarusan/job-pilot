@@ -10,7 +10,9 @@ import com.example.jobpilot.exception.EducationNotFoundException;
 import com.example.jobpilot.mapper.EducationMapper;
 import com.example.jobpilot.repository.CvRepository;
 import com.example.jobpilot.repository.EducationRepository;
+import com.example.jobpilot.security.CurrentUserProvider;
 import com.example.jobpilot.service.EducationService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +24,23 @@ public class EducationServiceImpl implements EducationService {
     private final EducationRepository educationRepository;
     private final CvRepository cvRepository;
     private final EducationMapper educationMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public EducationServiceImpl(EducationRepository educationRepository,
                                 CvRepository cvRepository,
-                                EducationMapper educationMapper) {
+                                EducationMapper educationMapper,
+                                CurrentUserProvider currentUserProvider) {
         this.educationRepository = educationRepository;
         this.cvRepository = cvRepository;
         this.educationMapper = educationMapper;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    private void checkOwnership(Cv cv) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (!currentUserId.equals(cv.getUser().getId())) {
+            throw new AccessDeniedException("Bu CV sənə aid deyil");
+        }
     }
 
     @Override
@@ -36,6 +48,8 @@ public class EducationServiceImpl implements EducationService {
 
         Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
+
+        checkOwnership(cv);
 
         Education education = new Education();
         education.setSchool(request.getSchool());
@@ -56,14 +70,18 @@ public class EducationServiceImpl implements EducationService {
         Education education = educationRepository.findById(id)
                 .orElseThrow(() -> new EducationNotFoundException(id));
 
+        checkOwnership(education.getCv());
+
         return educationMapper.toResponse(education);
     }
 
     @Override
     public List<EducationResponse> getByCvId(Long cvId) {
 
-        cvRepository.findById(cvId)
+        Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
+
+        checkOwnership(cv);
 
         return educationRepository.findByCvId(cvId)
                 .stream()
@@ -76,6 +94,8 @@ public class EducationServiceImpl implements EducationService {
 
         Education education = educationRepository.findById(id)
                 .orElseThrow(() -> new EducationNotFoundException(id));
+
+        checkOwnership(education.getCv());
 
         if (request.getSchool() != null)
             education.setSchool(request.getSchool());
@@ -102,6 +122,8 @@ public class EducationServiceImpl implements EducationService {
 
         Education education = educationRepository.findById(id)
                 .orElseThrow(() -> new EducationNotFoundException(id));
+
+        checkOwnership(education.getCv());
 
         educationRepository.delete(education);
     }

@@ -10,7 +10,9 @@ import com.example.jobpilot.exception.ExperienceNotFoundException;
 import com.example.jobpilot.mapper.ExperienceMapper;
 import com.example.jobpilot.repository.CvRepository;
 import com.example.jobpilot.repository.ExperienceRepository;
+import com.example.jobpilot.security.CurrentUserProvider;
 import com.example.jobpilot.service.ExperienceService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +24,23 @@ public class ExperienceServiceImpl implements ExperienceService {
     private final ExperienceRepository experienceRepository;
     private final CvRepository cvRepository;
     private final ExperienceMapper experienceMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public ExperienceServiceImpl(ExperienceRepository experienceRepository,
                                  CvRepository cvRepository,
-                                 ExperienceMapper experienceMapper) {
+                                 ExperienceMapper experienceMapper,
+                                 CurrentUserProvider currentUserProvider) {
         this.experienceRepository = experienceRepository;
         this.cvRepository = cvRepository;
         this.experienceMapper = experienceMapper;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    private void checkOwnership(Cv cv) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (!currentUserId.equals(cv.getUser().getId())) {
+            throw new AccessDeniedException("Bu CV sənə aid deyil");
+        }
     }
 
     @Override
@@ -36,6 +48,8 @@ public class ExperienceServiceImpl implements ExperienceService {
 
         Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
+
+        checkOwnership(cv);
 
         Experience experience = new Experience();
         experience.setCompany(request.getCompany());
@@ -56,14 +70,18 @@ public class ExperienceServiceImpl implements ExperienceService {
         Experience experience = experienceRepository.findById(id)
                 .orElseThrow(() -> new ExperienceNotFoundException(id));
 
+        checkOwnership(experience.getCv());
+
         return experienceMapper.toResponse(experience);
     }
 
     @Override
     public List<ExperienceResponse> getByCvId(Long cvId) {
 
-        cvRepository.findById(cvId)
+        Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
+
+        checkOwnership(cv);
 
         return experienceRepository.findByCvId(cvId)
                 .stream()
@@ -76,6 +94,8 @@ public class ExperienceServiceImpl implements ExperienceService {
 
         Experience experience = experienceRepository.findById(id)
                 .orElseThrow(() -> new ExperienceNotFoundException(id));
+
+        checkOwnership(experience.getCv());
 
         if (request.getCompany() != null)
             experience.setCompany(request.getCompany());
@@ -102,6 +122,8 @@ public class ExperienceServiceImpl implements ExperienceService {
 
         Experience experience = experienceRepository.findById(id)
                 .orElseThrow(() -> new ExperienceNotFoundException(id));
+
+        checkOwnership(experience.getCv());
 
         experienceRepository.delete(experience);
     }

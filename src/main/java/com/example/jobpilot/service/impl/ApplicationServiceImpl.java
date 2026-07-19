@@ -14,7 +14,9 @@ import com.example.jobpilot.mapper.ApplicationMapper;
 import com.example.jobpilot.repository.ApplicationRepository;
 import com.example.jobpilot.repository.JobRepository;
 import com.example.jobpilot.repository.UserRepository;
+import com.example.jobpilot.security.CurrentUserProvider;
 import com.example.jobpilot.service.ApplicationService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,19 +29,31 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final ApplicationMapper applicationMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public ApplicationServiceImpl(ApplicationRepository applicationRepository,
                                   UserRepository userRepository,
                                   JobRepository jobRepository,
-                                  ApplicationMapper applicationMapper) {
+                                  ApplicationMapper applicationMapper,
+                                  CurrentUserProvider currentUserProvider) {
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.applicationMapper = applicationMapper;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    private void checkOwnership(Long targetUserId) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (!currentUserId.equals(targetUserId)) {
+            throw new AccessDeniedException("Bu müraciət sənə aid deyil");
+        }
     }
 
     @Override
     public ApplicationResponse create(Long userId, Long jobId) {
+
+        checkOwnership(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -68,11 +82,15 @@ public class ApplicationServiceImpl implements ApplicationService {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
 
+        checkOwnership(application.getUser().getId());
+
         return applicationMapper.toResponse(application);
     }
 
     @Override
     public List<ApplicationResponse> getByUserId(Long userId) {
+
+        checkOwnership(userId);
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -89,6 +107,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
 
+        checkOwnership(application.getUser().getId());
+
         application.setStatus(request.getStatus());
 
         Application updated = applicationRepository.save(application);
@@ -101,6 +121,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
+
+        checkOwnership(application.getUser().getId());
 
         applicationRepository.delete(application);
     }

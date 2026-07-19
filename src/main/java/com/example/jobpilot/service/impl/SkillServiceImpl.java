@@ -10,7 +10,9 @@ import com.example.jobpilot.exception.SkillNotFoundException;
 import com.example.jobpilot.mapper.SkillMapper;
 import com.example.jobpilot.repository.CvRepository;
 import com.example.jobpilot.repository.SkillRepository;
+import com.example.jobpilot.security.CurrentUserProvider;
 import com.example.jobpilot.service.SkillService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +24,23 @@ public class SkillServiceImpl implements SkillService {
     private final SkillRepository skillRepository;
     private final CvRepository cvRepository;
     private final SkillMapper skillMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public SkillServiceImpl(SkillRepository skillRepository,
                             CvRepository cvRepository,
-                            SkillMapper skillMapper) {
+                            SkillMapper skillMapper,
+                            CurrentUserProvider currentUserProvider) {
         this.skillRepository = skillRepository;
         this.cvRepository = cvRepository;
         this.skillMapper = skillMapper;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    private void checkOwnership(Cv cv) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (!currentUserId.equals(cv.getUser().getId())) {
+            throw new AccessDeniedException("Bu CV sənə aid deyil");
+        }
     }
 
     @Override
@@ -36,6 +48,8 @@ public class SkillServiceImpl implements SkillService {
 
         Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
+
+        checkOwnership(cv);
 
         Skill skill = new Skill();
         skill.setName(request.getName());
@@ -53,14 +67,18 @@ public class SkillServiceImpl implements SkillService {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new SkillNotFoundException(id));
 
+        checkOwnership(skill.getCv());
+
         return skillMapper.toResponse(skill);
     }
 
     @Override
     public List<SkillResponse> getByCvId(Long cvId) {
 
-        cvRepository.findById(cvId)
+        Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new CvNotFoundException(cvId));
+
+        checkOwnership(cv);
 
         return skillRepository.findByCvId(cvId)
                 .stream()
@@ -73,6 +91,8 @@ public class SkillServiceImpl implements SkillService {
 
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new SkillNotFoundException(id));
+
+        checkOwnership(skill.getCv());
 
         if (request.getName() != null)
             skill.setName(request.getName());
@@ -90,6 +110,8 @@ public class SkillServiceImpl implements SkillService {
 
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new SkillNotFoundException(id));
+
+        checkOwnership(skill.getCv());
 
         skillRepository.delete(skill);
     }
