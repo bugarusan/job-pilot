@@ -18,4 +18,6 @@ public class UpdateCvRequest {
     private String phone;
 
     private String summary;
+
+    private String title;
 }

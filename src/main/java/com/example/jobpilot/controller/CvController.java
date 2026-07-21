@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -17,7 +19,7 @@ public class CvController {
 
     private final CvService cvService;
 
-    @PostMapping("/{userId}/cv")
+    @PostMapping("/{userId}/cvs")
     public ResponseEntity<CvResponse> create(
             @PathVariable Long userId,
             @Valid @RequestBody CreateCvRequest request) {
@@ -35,10 +37,10 @@ public class CvController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{userId}/cv")
-    public ResponseEntity<CvResponse> getByUserId(@PathVariable Long userId) {
+    @GetMapping("/{userId}/cvs")
+    public ResponseEntity<List<CvResponse>> getByUserId(@PathVariable Long userId) {
 
-        CvResponse response = cvService.getByUserId(userId);
+        List<CvResponse> response = cvService.getByUserId(userId);
 
         return ResponseEntity.ok(response);
     }
@@ -52,6 +54,15 @@ public class CvController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/cvs/{id}/default")
+    public ResponseEntity<CvResponse> setDefault(@PathVariable Long id) {
+
+        CvResponse response = cvService.setDefault(id);
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @DeleteMapping("/cvs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

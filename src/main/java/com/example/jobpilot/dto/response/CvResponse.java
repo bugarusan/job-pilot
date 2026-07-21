@@ -23,9 +23,15 @@ public class CvResponse {
 
     private String summary;
 
+    private String title;
+
+    private boolean isDefault;
+
     private List<ExperienceResponse> experiences;
 
     private List<EducationResponse> educations;
 
     private List<SkillResponse> skills;
+
+
 }

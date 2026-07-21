@@ -39,7 +39,7 @@ public class SkillServiceImpl implements SkillService {
     private void checkOwnership(Cv cv) {
         Long currentUserId = currentUserProvider.getCurrentUserId();
         if (!currentUserId.equals(cv.getUser().getId())) {
-            throw new AccessDeniedException("Bu CV sənə aid deyil");
+            throw new AccessDeniedException("This CV is not about you");
         }
     }
 

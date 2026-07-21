@@ -46,7 +46,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private void checkOwnership(Long targetUserId) {
         Long currentUserId = currentUserProvider.getCurrentUserId();
         if (!currentUserId.equals(targetUserId)) {
-            throw new AccessDeniedException("Bu müraciət sənə aid deyil");
+            throw new AccessDeniedException("This application does not apply to you.");
         }
     }
 

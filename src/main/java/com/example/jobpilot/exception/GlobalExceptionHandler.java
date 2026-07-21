@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
-                "Email və ya parol yanlışdır"
+                "Email or password is incorrect"
         );
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
-                "Autentifikasiya alınmadı"
+                "Authentication failed"
         );
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
-                "Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur"
+                "You do not have permission to perform this operation"
         );
 
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
@@ -99,16 +99,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(CvAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleCvAlreadyExists(CvAlreadyExistsException ex) {
-
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                ex.getMessage()
-        );
-
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
-    }
 
     @ExceptionHandler(EducationNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEducationNotFound(EducationNotFoundException ex) {
@@ -159,7 +149,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Daxili server xətası baş verdi"
+                "An internal server error occurred"
         );
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

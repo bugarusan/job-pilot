@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     private void checkOwnership(Long targetUserId) {
         Long currentUserId = currentUserProvider.getCurrentUserId();
         if (!currentUserId.equals(targetUserId)) {
-            throw new AccessDeniedException("Bu hesab sənə aid deyil");
+            throw new AccessDeniedException("This account does not belong to you");
         }
     }
 
@@ -69,14 +69,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toResponse(user);
     }
 
-    @Override
-    public UserResponse getByEmail(String email) {
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
-
-        return userMapper.toResponse(user);
-    }
 
     @Override
     public UserResponse updateProfile(Long id, UpdateUserRequest request) {

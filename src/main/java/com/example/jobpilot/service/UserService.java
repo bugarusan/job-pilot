@@ -10,8 +10,6 @@ public interface UserService {
 
     UserResponse getById(Long id);
 
-    UserResponse getByEmail(String email);
-
     UserResponse updateProfile(Long id, UpdateUserRequest request);
 
     void deleteAccount(Long id);

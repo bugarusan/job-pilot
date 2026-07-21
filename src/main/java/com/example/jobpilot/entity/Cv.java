@@ -29,8 +29,14 @@ public class Cv {
     @Column(length = 2000)
     private String summary;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private boolean isDefault = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @JsonManagedReference

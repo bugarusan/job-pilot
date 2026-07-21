@@ -37,8 +37,8 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Cv cv;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Cv> cvs;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Application> applications;
