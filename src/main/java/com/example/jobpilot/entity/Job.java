@@ -20,18 +20,26 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
+    private boolean remote;
+
+    @Column(nullable = false)
     private String company;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private String location;
 
     private String salary;
 
     @ElementCollection
+    @CollectionTable(name = "job_required_skills", joinColumns = @JoinColumn(name = "job_id"))
+    @Column(name = "skill")
     private List<String> requiredSkills;
 
     private String url;
@@ -40,9 +48,11 @@ public class Job {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
 
-    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Application> applications;
 }

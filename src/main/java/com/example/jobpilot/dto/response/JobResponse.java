@@ -31,4 +31,6 @@ public class JobResponse {
     private String url;
 
     private LocalDateTime createdAt;
+
+    private boolean remote;
 }

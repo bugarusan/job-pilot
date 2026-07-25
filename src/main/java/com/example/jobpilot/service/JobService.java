@@ -9,4 +9,8 @@ public interface JobService {
     JobResponse getById(Long id);
 
     List<JobResponse> getAll();
+
+    List<JobResponse> search(String query);
+
+    List<JobResponse> getBySkill(String skill);
 }

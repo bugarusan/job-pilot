@@ -8,9 +8,9 @@ import com.example.jobpilot.repository.JobRepository;
 import com.example.jobpilot.service.JobService;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.List;
-
-import java.util.stream.Collectors;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -39,6 +39,37 @@ public class JobServiceImpl implements JobService {
         return jobRepository.findAll()
                 .stream()
                 .map(jobMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Override
+    public List<JobResponse> search(String query) {
+
+        if (query == null || query.isBlank()) {
+            return getAll();
+        }
+
+        query = query.trim();
+
+        Set<Job> jobs = new LinkedHashSet<>();
+
+        jobs.addAll(jobRepository.findByTitleContainingIgnoreCase(query));
+        jobs.addAll(jobRepository.findByCompanyContainingIgnoreCase(query));
+        jobs.addAll(jobRepository.findByLocationContainingIgnoreCase(query));
+        jobs.addAll(jobRepository.findByDescriptionContainingIgnoreCase(query));
+        jobs.addAll(jobRepository.findBySkill(query));
+
+        return jobs.stream()
+                .map(jobMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<JobResponse> getBySkill(String skill) {
+
+        return jobRepository.findBySkill(skill)
+                .stream()
+                .map(jobMapper::toResponse)
+                .toList();
     }
 }
