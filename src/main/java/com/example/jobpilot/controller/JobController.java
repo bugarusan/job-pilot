@@ -51,11 +51,4 @@ public class JobController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/import")
-    public ResponseEntity<Void> importJobs() {
-
-        jobImportService.importJobs();
-
-        return ResponseEntity.ok().build();
-    }
 }
