@@ -13,7 +13,7 @@ public class JobImportScheduler {
         this.jobImportService = jobImportService;
     }
 
-    @Scheduled(fixedRate = 900000)
+    @Scheduled(cron = "0 0 */2 * * *")
     public void importJobs() {
         jobImportService.importJobs();
     }
