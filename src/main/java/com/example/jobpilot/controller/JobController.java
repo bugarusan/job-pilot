@@ -1,7 +1,6 @@
 package com.example.jobpilot.controller;
 
 import com.example.jobpilot.dto.response.JobResponse;
-import com.example.jobpilot.service.JobImportService;
 import com.example.jobpilot.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import java.util.List;
 public class JobController {
 
     private final JobService jobService;
-    private final JobImportService jobImportService;
 
     @GetMapping("/all")
     public ResponseEntity<List<JobResponse>> getAll() {
