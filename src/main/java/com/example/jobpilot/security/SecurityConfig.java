@@ -32,7 +32,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/users/register",
-                                "/api/v1/auth/login"
+                                "/api/v1/auth/login",
+                                "/actuator/health",
+                                "/actuator/health/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

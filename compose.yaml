@@ -1,0 +1,58 @@
+name: jobpilot
+
+services:
+  app:
+    image: ${APP_IMAGE:-jobpilot:local}
+    build:
+      context: .
+      target: runtime
+      args:
+        JAVA_VERSION: "21"
+    init: true
+    restart: unless-stopped
+    shm_size: 1gb
+    stop_grace_period: 40s
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-jobpilot}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-jobpilot}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env to a Base64-encoded key}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--XX:MaxRAMPercentage=60.0}
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: docker.io/library/postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jobpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-jobpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres-data:
