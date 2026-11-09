@@ -242,6 +242,22 @@ DELETE
 
 # Getting Started
 
+## Run everything with Docker (recommended)
+
+Copy `.env.example` to `.env`, set `POSTGRES_PASSWORD` and `JWT_SECRET` using
+`openssl rand -hex 32` and `openssl rand -base64 32`, then run:
+
+```bash
+docker compose up --build -d --wait --wait-timeout 180
+```
+
+The backend is available at `http://localhost:8080`. PostgreSQL and the Chromium
+browser used for job imports run in Docker; no host Java or database is required.
+See [Docker setup and operations](docs/docker.md) for configuration, persistence,
+backups, and extending the stack.
+
+## Run locally with Maven
+
 Clone the repository
 
 ```bash
